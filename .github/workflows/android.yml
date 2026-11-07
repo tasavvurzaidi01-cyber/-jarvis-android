@@ -1,11 +1,14 @@
+
 name: Build JARVIS Android APK
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'JARVIS-Android-Starter.zip'
-      - '.github/workflows/android.yml'
+      - '**'
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -15,15 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract project ZIP
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip
-          mkdir extracted
-          unzip -q JARVIS-Android-Starter.zip -d extracted
-          PROJECT_DIR=$(find extracted -name settings.gradle.kts -printf '%h\n' | head -n 1)
-          cp -R     "$PROJECT_DIR"/. .
-          sed    -i 's/VERSION_1_8/VERSION_17/g' app/build.gradle.kts
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -36,10 +30,11 @@ jobs:
           gradle-version: '8.9'
 
       - name: Build APK
-        run: gradle assembleDebug
+        run: gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: JARVIS-APK
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
