@@ -22,8 +22,8 @@ jobs:
           mkdir extracted
           unzip -q JARVIS-Android-Starter.zip -d extracted
           PROJECT_DIR=$(find extracted -name settings.gradle.kts -printf '%h\n' | head -n 1)
-          cp -R "$PROJECT_DIR"/. .
-
+          cp -R     "$PROJECT_DIR"/. .
+          sed    -i 's/VERSION_1_8/VERSION_17/g' app/build.gradle.kts
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
