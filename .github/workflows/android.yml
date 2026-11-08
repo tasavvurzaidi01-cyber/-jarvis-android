@@ -29,6 +29,45 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Download Sherpa ONNX
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION=2.0.1
+          MODEL=sherpa-onnx-kws-zipformer-gigaspeech-3.3M-2024-01-01
+          MODEL_DIR="app/src/main/assets/$MODEL"
+
+          mkdir -p app/libs app/src/main/assets
+
+          curl -fL \
+            "https://github.com/k2-fsa/sherpa-onnx/releases/download/v${VERSION}/sherpa-onnx-${VERSION}.aar" \
+            -o "app/libs/sherpa-onnx-${VERSION}.aar"
+
+          curl -fL \
+            "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/${MODEL}.tar.bz2" \
+            -o "/tmp/${MODEL}.tar.bz2"
+
+          tar -xjf "/tmp/${MODEL}.tar.bz2" \
+            -C app/src/main/assets
+
+          python -m pip install "sherpa-onnx==${VERSION}"
+
+          printf 'HEY JARVIS\n' > /tmp/keywords_raw.txt
+
+          sherpa-onnx-cli text2token \
+            --tokens "$MODEL_DIR/tokens.txt" \
+            --tokens-type bpe \
+            --bpe-model "$MODEL_DIR/bpe.model" \
+            /tmp/keywords_raw.txt \
+            "$MODEL_DIR/keywords.txt"
+
+          rm -rf "$MODEL_DIR/test_wavs"
+          rm -f "$MODEL_DIR/bpe.model"
+          rm -f "$MODEL_DIR/keywords_raw.txt"
+          rm -f "$MODEL_DIR/README.md"
+          rm -f "$MODEL_DIR/configuration.json"
+
       - name: Build APK
         run: gradle --no-daemon assembleDebug
 
@@ -38,3 +77,4 @@ jobs:
           name: JARVIS-APK
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          
