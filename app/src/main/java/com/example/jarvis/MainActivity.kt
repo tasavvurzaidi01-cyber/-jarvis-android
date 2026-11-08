@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
@@ -66,6 +67,20 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
             text = "भेजें"
             setOnClickListener { handleText(input.text.toString()) }
         }
+        val wake = Button(this).apply {
+            text = "🟢 Hey Jarvis ON"
+            setOnClickListener {
+                if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    val service = Intent(this@MainActivity, WakeWordService::class.java)
+                    if (Build.VERSION.SDK_INT >= 26) startForegroundService(service) else startService(service)
+                    status.text = "Hey Jarvis सुनने की कोशिश चालू है। Notification दिखेगा।"
+                } else requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), requestAudio)
+            }
+        }
+        val stopWake = Button(this).apply {
+            text = "🔴 Hey Jarvis OFF"
+            setOnClickListener { stopService(Intent(this@MainActivity, WakeWordService::class.java)); status.text = "Wake word बंद है।" }
+        }
         val mic = Button(this).apply {
             text = "🎙 बोलकर पूछें"
             setOnClickListener { startListening() }
@@ -75,6 +90,8 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
         page.addView(input, LinearLayout.LayoutParams(-1, -2))
         page.addView(send, LinearLayout.LayoutParams(-1, -2))
         page.addView(mic, LinearLayout.LayoutParams(-1, -2))
+        page.addView(wake, LinearLayout.LayoutParams(-1, -2))
+        page.addView(stopWake, LinearLayout.LayoutParams(-1, -2))
         setContentView(page)
     }
 
