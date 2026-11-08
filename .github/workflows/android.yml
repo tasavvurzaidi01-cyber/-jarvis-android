@@ -51,7 +51,7 @@ jobs:
           tar -xjf "/tmp/${MODEL}.tar.bz2" \
             -C app/src/main/assets
 
-          python -m pip install "sherpa-onnx==${VERSION}" sentencepiece
+          python -m pip install "sherpa-onnx==${VERSION}" sentencepiece pypinyin
 
           printf 'HEY JARVIS\n' > /tmp/keywords_raw.txt
 
