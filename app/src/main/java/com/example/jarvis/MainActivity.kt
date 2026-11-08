@@ -93,7 +93,7 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
         val reply = when {
             q.contains("नमस्ते") || q.contains("hello") || q == "hi" ->
                 "नमस्ते! बताइए, मैं आपकी क्या मदद करूँ?"
-            q.contains("समय") || q.contains("time") || q.contains("बजे") || q.contains("kitne baje") ->
+            q.contains("समय") || q.contains("समय हुआ") || q.contains("बजे") || q.contains("टाइम") || q.contains("time") || q.contains("kitne baje") || q.contains("time kya hua") || q.contains("kya hua hai") || q.contains("abhi time") ->
                 "अभी समय " + SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date()) + " है।"
             q.contains("तारीख") || q.contains("date") ->
                 "आज " + SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("hi", "IN")).format(Date()) + " है।"
