@@ -29,7 +29,20 @@ jobs:
           gradle-version: '8.9'
 
       - name: Build APK
-        run: gradle --no-daemon assembleDebug
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            echo "APK build attempt $attempt of 5"
+            if gradle --no-daemon assembleDebug; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 5 ]; then
+              echo "Build failed; retrying after 15 seconds."
+              sleep 15
+            fi
+          done
+          exit 1
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
