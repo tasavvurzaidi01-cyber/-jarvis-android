@@ -40,11 +40,11 @@ jobs:
 
           mkdir -p app/libs app/src/main/assets
 
-          curl -fL \
+          curl --retry 5 --retry-all-errors --retry-delay 5 -fL \
             "https://github.com/k2-fsa/sherpa-onnx/releases/download/v${VERSION}/sherpa-onnx-${VERSION}.aar" \
             -o "app/libs/sherpa-onnx-${VERSION}.aar"
 
-          curl -fL \
+          curl --retry 5 --retry-all-errors --retry-delay 5 -fL \
             "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/${MODEL}.tar.bz2" \
             -o "/tmp/${MODEL}.tar.bz2"
 
