@@ -70,11 +70,21 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
         val wake = Button(this).apply {
             text = "🟢 Hey Jarvis ON"
             setOnClickListener {
-                if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                val needed = mutableListOf<String>()
+                if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    needed.add(Manifest.permission.RECORD_AUDIO)
+                }
+                if (Build.VERSION.SDK_INT >= 33 &&
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    needed.add(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                if (needed.isNotEmpty()) {
+                    requestPermissions(needed.toTypedArray(), requestAudio)
+                } else {
                     val service = Intent(this@MainActivity, WakeWordService::class.java)
                     if (Build.VERSION.SDK_INT >= 26) startForegroundService(service) else startService(service)
                     status.text = "Hey Jarvis सुनने की कोशिश चालू है। Notification दिखेगा।"
-                } else requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), requestAudio)
+                }
             }
         }
         val stopWake = Button(this).apply {
